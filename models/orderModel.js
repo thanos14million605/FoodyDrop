@@ -15,7 +15,7 @@ const orderSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Menu',
-            required: true,
+            required: [true, 'At least one menu should be selected in order to make an order.'],
         }
     ],
 
@@ -42,22 +42,27 @@ const orderSchema = new mongoose.Schema({
     },
     paymentStatus: {
         type: String,
-        default: 'unpaid',
+        default: 'pending',
         enum: [
             'unpaid', 'paid', 
-            // 'refunded',   // There will be nothing like refunded in Gambia lol   
+            'refunded',   // There will be nothing like refunded in Gambia lol
+                        // but if the order never arrived and customer has paid,
+                        // then they deserve to be refunded.   
             'failed', 'pending'       
         ]
     },
     placedAt: {
         type: Date,
-        default: new Date()
+        default: Date.now
     },
     // To be filled by delivery once he clicked 
     // delivered on frontend, then this field 
     // must be field with that date.
     deliveredAt: {
         type: Date,
+    },
+    deliveryAddress: {
+        type: String
     },
     deliveryLocation: {
         type: {
@@ -72,11 +77,22 @@ const orderSchema = new mongoose.Schema({
     },
     tipAmount: {
         type: Number,
-        default: 0,
-        select: false
     },
+    paymentOptions: {
+        type: String,
+        required: [true, 'Payment option must be selected.'],
+        enum: {
+            values: [
+                'cash on delivery',
+                'pay on delivery',
+                'stripe online payment',
+                'pay before delivery'
+            ],
+            message: 'At least one option must be selected.'
+        }
+    },
+    
 }, { 
-    timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
