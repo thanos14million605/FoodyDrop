@@ -7,7 +7,6 @@ const orderHistorySchema = new mongoose.Schema({
     },
     orderCancelledCount: {
         type: Number,
-        default: 0,
     },
 
 }, { timestamps: true });
